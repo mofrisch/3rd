@@ -1,48 +1,38 @@
-<script setup lang="ts">
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
-import Greet from "./components/Greet.vue";
+<script setup>
+import { invoke } from '@tauri-apps/api/tauri'
+import { ref } from 'vue'
+import { HashtagIcon, PlayIcon } from "@heroicons/vue/24/solid";
+import { info } from "tauri-plugin-log-api";
+
+const input = ref('')
+
+const interpreter = () => {
+  invoke('interpret', { input: input.value }).then((result) => {
+    info("Result: " + result);
+    document.getElementById('output').innerHTML = "";
+    document.getElementById('output').innerHTML += result;
+    //document.getElementById('input').value = ''
+    input.value = '';
+  });
+}
 </script>
 
 <template>
-  <div class="container">
-    <h1>Welcome to Tauri!</h1>
-
-    <div class="row">
-      <a href="https://vitejs.dev" target="_blank">
-        <img src="/vite.svg" class="logo vite" alt="Vite logo" />
-      </a>
-      <a href="https://tauri.app" target="_blank">
-        <img src="/tauri.svg" class="logo tauri" alt="Tauri logo" />
-      </a>
-      <a href="https://vuejs.org/" target="_blank">
-        <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-      </a>
+  <div>
+    <div class="mt-2 mx-2 flex rounded-md shadow-sm sticky bottom z-20">
+      <div class="relative flex flex-grow items-stretch focus-within:z-10">
+        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+          <HashtagIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+        </div>
+        <input id="input" v-model="input" @keyup.enter="interpreter"
+          class="block w-full rounded-none rounded-l-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+      </div>
+      <button @click="interpreter"
+        class="relative -ml-px inline-flex items-center gap-x-1.5 rounded-r-md px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+        <PlayIcon class="-ml-0.5 h-5 w-5 text-green-600" aria-hidden=" true" />
+        OK
+      </button>
     </div>
-
-    <p>Click on the Tauri, Vite, and Vue logos to learn more.</p>
-
-    <p>
-      Recommended IDE setup:
-      <a href="https://code.visualstudio.com/" target="_blank">VS Code</a>
-      +
-      <a href="https://github.com/johnsoncodehk/volar" target="_blank">Volar</a>
-      +
-      <a href="https://github.com/tauri-apps/tauri-vscode" target="_blank">Tauri</a>
-      +
-      <a href="https://github.com/rust-lang/rust-analyzer" target="_blank">rust-analyzer</a>
-    </p>
-
-    <Greet />
   </div>
+  <p class="mx-2" id="output"></p>
 </template>
-
-<style scoped>
-.logo.vite:hover {
-  filter: drop-shadow(0 0 2em #747bff);
-}
-
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #249b73);
-}
-</style>
